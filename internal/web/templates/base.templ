@@ -1,0 +1,38 @@
+package templates
+
+templ header(deviceDesc string) {
+	<head>
+		<title>Noreza - { deviceDesc }</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<script src="/static/js/htmx.min.js"></script>
+		<script defer src="/static/js/alpinejs.min.js"></script>
+		<script src="/static/js/custom/init.js"></script>
+		<link rel="stylesheet" href="/static/css/dist/style.css"/>
+	</head>
+}
+
+templ sidebar(deviceDesc, serial string) {
+	<aside class="w-64 bg-gray-800 text-white flex flex-col">
+		<span class="text-center pt-2 text-lg">Azeron { deviceDesc }</span>
+		<span class="text-center pb-2 text-xs">Device Serial: ...{ serial[len(serial)-4:] }</span>
+		<ul id="profiles" hx-get="/profiles" hx-swap="innerHTML" hx-trigger="load" class="flex-1 overflow-y-auto"></ul>
+	</aside>
+}
+
+templ Layout(deviceDesc, serial string) {
+	<!DOCTYPE html>
+	<html>
+		@header(deviceDesc)
+		<body>
+			<div class="flex flex-col h-screen">
+				<div class="flex flex-1 overflow-hidden">
+					@sidebar(deviceDesc, serial)
+					<main id="editor" class="flex-1 bg-gray-900">
+						@EditorDefault(false)
+					</main>
+				</div>
+			</div>
+		</body>
+	</html>
+}

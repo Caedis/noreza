@@ -1,0 +1,47 @@
+name: Release Package
+
+on:
+  push:
+    tags: [ '*' ]
+
+permissions:
+  contents: write
+
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+          fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.25'
+
+    - name: Install templ
+      run: |
+        go install github.com/a-h/templ/cmd/templ@latest
+
+    - name: Verify tool versions
+      run: |
+        go version
+        templ version
+
+    - name: update tailwindcss
+      uses: ZoeyVid/tailwindcss-update@main
+      with:
+        input: ./internal/web/static/css/input.css
+        output: ./internal/web/static/css/dist/style.css
+        params: "--minify"
+
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v6.4.0
+      with:
+        args: release --clean
+        version: "~> v2"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,93 @@
+package templates
+
+import "github.com/caedis/noreza/internal/mapping"
+import "fmt"
+
+templ ProfileList(profiles []mapping.Profile) {
+	<span x-data class="pl-2 text-lg font-bold">Profiles</span>
+	<hr class=" text-purple-900 mx-1 mb-2"/>
+	for _, prof := range profiles {
+		@profile(prof)
+	}
+	<li
+		class="px-4 py-1 text-blue-400 cursor-pointer"
+		hx-post="/profiles"
+		hx-prompt="Enter Profile Name"
+		hx-target="#profiles"
+		hx-swap="innerHTML"
+	>
+		+ Add Profile
+	</li>
+}
+
+templ profile(prof mapping.Profile) {
+	<li class="px-4 py-1 hover:bg-gray-700 cursor-pointer flex justify-between items-center" x-bind:class={ fmt.Sprintf("$store.profiles.selectedProfile === '\"%s\"' ? 'bg-gray-600' : ''", prof.Name) }>
+		<div
+			class="flex-1"
+			hx-get={ fmt.Sprintf("/profiles/%s/editor", prof.Name) }
+			hx-swap="innerHTML"
+			hx-target="#editor"
+		>
+			<span>
+				{ prof.Name }
+			</span>
+		</div>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="w-5 h-5 text-yellow-400"
+			fill="currentColor"
+			viewBox="0 0 20 20"
+			x-bind:hidden={ fmt.Sprintf("$store.profiles.activeProfile === '\"%s\"' ? false : true", prof.Name) }
+		>
+			<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.462a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118L10 14.347l-3.951 2.91c-.785.57-1.84-.197-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.047 9.393c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.966z"></path>
+		</svg>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="w-5 h-5 text-gray-400 hover:text-yellow-400 cursor-pointer"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+			stroke-width="2"
+			hx-post={ fmt.Sprintf("/profiles/%s/activate", prof.Name) }
+			hx-target="#profiles"
+			hx-swap="innerHTML"
+			x-bind:hidden={ fmt.Sprintf("$store.profiles.activeProfile === '\"%s\"' ? true : false", prof.Name) }
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.462a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118L12 17.347l-3.951 2.91c-.785.57-1.84-.197-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L4.047 9.393c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.966z"
+			></path>
+		</svg>
+		<svg
+			viewBox="0 0 1024 1024"
+			class="w-5 h-5 text-gray-400 hover:text-red-600 cursor-pointer"
+			version="1.1"
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="5"
+			hx-delete={ fmt.Sprintf("/profiles/%s", prof.Name) }
+			hx-confirm={ fmt.Sprintf("Are you sure you wish to delete \"%s\"", prof.Name) }
+			hx-target="#profiles"
+			hx-swap="innerHTML"
+			x-bind:hidden={ fmt.Sprintf("$store.profiles.activeProfile === '\"%s\"' ? true : false", prof.Name) }
+		>
+			<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+			<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+			<g id="SVGRepo_iconCarrier">
+				<path d="M799.6 386.9H863c7.6 0 13.9 6.2 13.9 13.9v29.7c0 7.6-6.2 13.9-13.9 13.9h-63.4v-57.5z" fill="#A4A9AD"></path>
+				<path d="M799.6 386.9h29.6v57.5h-29.6z" fill=""></path>
+				<path d="M223.4 386.9H160c-7.6 0-13.9 6.2-13.9 13.9v29.7c0 7.6 6.2 13.9 13.9 13.9h63.4v-57.5z" fill="#A4A9AD"></path>
+				<path d="M193.8 386.9h29.6v57.5h-29.6z" fill=""></path>
+				<path d="M686.6 214.2h-70.7V158c0-11.7-9.9-21.7-21.7-21.7H428.7c-11.7 0-21.7 9.9-21.7 21.7v56.2h-70.7V158c0-50.9 41.4-92.4 92.4-92.4h165.5c50.9 0 92.4 41.4 92.4 92.4v56.2z" fill="#A4A9AD"></path>
+				<path d="M686.4 151.8H615c0.6 2 0.9 4 0.9 6.2v56.2h70.7V158c0-2.1-0.1-4.1-0.2-6.2zM336.3 158v56.2H407V158c0-2.1 0.3-4.2 0.9-6.2h-71.4c-0.1 2.1-0.2 4.1-0.2 6.2z" fill=""></path>
+				<path d="M776.4 208.8c0-18.8-15.4-34.2-34.2-34.2H280.8c-18.8 0-34.2 15.4-34.2 34.2v48.9c0 18.8 15.4 34.2 34.2 34.2h461.4c18.8 0 34.2-15.4 34.2-34.2v-48.9z" fill="#D1D3D3"></path>
+				<path d="M775.7 202.1H247.2c-0.4 2.2-0.7 4.4-0.7 6.7v48.9c0 18.8 15.4 34.2 34.2 34.2h461.4c18.8 0 34.2-15.4 34.2-34.2v-48.9c0.1-2.3-0.1-4.5-0.6-6.7z" fill=""></path>
+				<path d="M211.5 301.2v606.6c0 28.7 23.5 52.1 52.1 52.1h495.7c28.7 0 52.1-23.5 52.1-52.1V301.2H211.5z" fill="#D1D3D3"></path>
+				<path d="M211.5 878.8v29c0 28.7 23.5 52.1 52.1 52.1h495.7c28.7 0 52.1-23.5 52.1-52.1v-29H211.5zM211.5 301.2h600v74.2h-600z" fill=""></path>
+				<path d="M852.3 263.7c0-18.8-15.4-34.2-34.2-34.2H204.9c-18.8 0-34.2 15.4-34.2 34.2v35.2c0 18.8 15.4 34.2 34.2 34.2h613.2c18.8 0 34.2-15.4 34.2-34.2v-35.2zM511.5 818.1c-19.5 0-35.4-15.8-35.4-35.4V451c0-19.5 15.8-35.4 35.4-35.4s35.4 15.8 35.4 35.4v331.8c-0.1 19.5-15.9 35.3-35.4 35.3zM348 818.1c-19.5 0-35.4-15.8-35.4-35.4V451c0-19.5 15.8-35.4 35.4-35.4 19.5 0 35.4 15.8 35.4 35.4v331.8c0 19.5-15.9 35.3-35.4 35.3zM674.9 818.1c-19.5 0-35.4-15.8-35.4-35.4V451c0-19.5 15.8-35.4 35.4-35.4 19.5 0 35.4 15.8 35.4 35.4v331.8c0 19.5-15.8 35.3-35.4 35.3z" fill="#A4A9AD"></path>
+			</g>
+		</svg>
+	</li>
+}

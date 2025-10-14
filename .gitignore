@@ -1,0 +1,41 @@
+/noreza
+/main
+dist/
+bin/
+tmp/
+*.db
+*.prof
+
+# Binaries for programs and plugins
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env
+.envrc
+
+# Editor/IDE
+.idea/
+.vscode/
+
+# Ignore build outputs from performing a nix-build or `nix build` command
+result
+result-*
+
+# Ignore automatically generated direnv output
+.direnv
+
+*_templ.go

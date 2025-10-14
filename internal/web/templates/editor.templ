@@ -1,0 +1,374 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/caedis/noreza/internal/mapping"
+)
+
+templ EditorDefault(isSwap bool) {
+	if isSwap {
+		<div id="editor" hx-swap-oob="innerHTML">
+			<p class="text-gray-500">Select a profile to edit its mappings.</p>
+		</div>
+	} else {
+		<p class="text-gray-500">Select a profile to edit its mappings.</p>
+	}
+}
+
+templ Editor(m mapping.Mapping, profile, device string) {
+	<script>
+		var joystick_size = 248
+		var deadzone = {{ m.AxisDeadzone }}
+		var deadzone_size = Math.floor(deadzone / joystick_size)
+	</script>
+	<div class="flex min-h-screen flex-col items-center justify-center bg-gray-900 text-white">
+		<span class="text-3xl mb-4">{ profile }</span>
+		<div class="flex-row">
+			<button
+				class="ml-3 bg-gray-500 hover:bg-gray-600 rounded-md px-4 py-1"
+				hx-patch={ fmt.Sprintf("/profiles/%s/clear", profile) }
+				hx-confirm="Are you sure?"
+				hx-target="#editor"
+			>Clear Binds</button>
+			<button
+				class="ml-3 bg-gray-500 hover:bg-gray-600 rounded-md px-4 py-1"
+				hx-get={ fmt.Sprintf("/profiles/%s/settings", profile) }
+				hx-target="#modal-wrapper"
+				hx-swap="innerHTML"
+			>Settings</button>
+		</div>
+		<div
+			class="mt-12"
+		>
+			if device == "cyborg2" {
+				@cyborg2(m, profile)
+			}
+		</div>
+	</div>
+	<dialog id="modal-wrapper"></dialog>
+}
+
+templ EditorModal(profile string, index uint8, mappingType, subkey string) {
+	<div class="fixed inset-0 flex items-center justify-center">
+		<div class="relative bg-gray-800 p-6 text-center text-white w-90">
+			<h2 class="text-xl mb-4">Press a key</h2>
+			<p class="text-sm text-gray-400">Remapping { mappingType } #{ index + 1 }</p>
+			<div
+				hx-target="#editor"
+			>
+				<div
+					tabindex="0"
+					class="outline-none"
+					hx-patch={ fmt.Sprintf("/profiles/%s/update", profile) }
+					hx-vals={ fmt.Sprintf(`js:{
+						"type": "%s",
+						"subkey": "%s",
+						"index": %d,
+						"mode": 0,
+						"value": event.key
+					}`, mappingType, subkey, index) }
+					hx-trigger="keydown from:body consume"
+				></div>
+				<div class="mt-4 flex justify-center gap-3">
+					<button
+						class="text-xs px-4 py-2 bg-purple-500 rounded hover:bg-purple-600"
+						hx-patch={ fmt.Sprintf("/profiles/%s/update", profile) }
+						hx-vals={ fmt.Sprintf(`{
+						"type": "%s",
+						"subkey": "%s",
+						"index": %d,
+						"mode": 1,
+						"value": "LClick"
+					}`, mappingType, subkey, index) }
+					>
+						Left Click
+					</button>
+					<button
+						class="text-xs px-4 py-2 bg-purple-500 rounded hover:bg-purple-600"
+						hx-patch={ fmt.Sprintf("/profiles/%s/update", profile) }
+						hx-vals={ fmt.Sprintf(`{
+						"type": "%s",
+						"subkey": "%s",
+						"index": %d,
+						"mode": 1,
+						"value": "MClick"
+					}`, mappingType, subkey, index) }
+					>
+						Middle Click
+					</button>
+					<button
+						class="text-xs px-4 py-2 bg-purple-500 rounded hover:bg-purple-600"
+						hx-patch={ fmt.Sprintf("/profiles/%s/update", profile) }
+						hx-vals={ fmt.Sprintf(`{
+						"type": "%s",
+						"subkey": "%s",
+						"index": %d,
+						"mode": 1,
+						"value": "RClick"
+					}`, mappingType, subkey, index) }
+					>
+						Right Click
+					</button>
+				</div>
+				<div class="mt-4 flex justify-center gap-3">
+					<button
+						class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600"
+						hx-patch={ fmt.Sprintf("/profiles/%s/update", profile) }
+						hx-vals={ templ.JSONString(map[string]any{
+						"type":    mappingType,
+						"subkey":  subkey,
+						"index":   index,
+						"mode": 0,
+						"value":   "",
+					}) }
+					>
+						Clear
+					</button>
+					<button
+						class="absolute top-1 right-1 text-xs p-1 text-gray-500 hover:text-gray-600 font-bold"
+						onclick="document.getElementById('modal-wrapper').close()"
+						hx-disinherit="*"
+					>
+						X
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+        var model = document.getElementById('modal-wrapper')
+        model.setAttribute("closedby", "none")
+        model.showModal();
+    </script>
+}
+
+templ MappingButton(index uint8, m mapping.Mapping, row, col int, profile string) {
+	<button
+		data-key={ fmt.Sprintf("button-%d", index-1) }
+		class="flex items-center justify-center rounded-lg bg-purple-700 relative h-18 w-18 cursor-pointer hover:bg-purple-600 text-base"
+		style={ fmt.Sprintf("grid-column-start: %d; grid-row-start:%d;", col, row) }
+		hx-get={ fmt.Sprintf("/profiles/%s/update", profile) }
+		hx-target="#modal-wrapper"
+		hx-swap="innerHTML"
+		hx-vals={ templ.JSONString(map[string]any{
+			"type":    "button",
+			"index":   index - 1,
+		}) }
+	>
+		if key, ok := m.Buttons[index-1]; ok {
+			if key.Mode == mapping.Mouse {
+				{ mapping.CodeToMouse[key.Code] }
+			} else {
+				{ mapping.CodeToKey[key.Code] }
+			}
+		}
+		<span class="absolute bottom-1 left-1 text-[10px] font-bold ml-0.5">#{ index }</span>
+	</button>
+}
+
+templ DirectionButton(dir string, label string, hxVals map[string]any, keyLabel, profile string) {
+	<button
+		if hxVals["subkey"] == nil {
+			data-key={ fmt.Sprintf("%s-%d", hxVals["type"], hxVals["index"]) }
+		} else {
+			data-key={ fmt.Sprintf("%s-%d-%s", hxVals["type"], hxVals["index"], hxVals["subkey"]) }
+		}
+		class={ fmt.Sprintf("absolute %s w-18 h-18 bg-purple-700 hover:bg-purple-800 flex items-center justify-center rounded-lg text-base", dir) }
+		hx-get={ fmt.Sprintf("/profiles/%s/update", profile) }
+		hx-target="#modal-wrapper"
+		hx-swap="innerHTML"
+		hx-vals={ templ.JSONString(hxVals) }
+	>
+		{ keyLabel }
+		<span class="absolute bottom-1 left-1 text-[10px] font-bold ml-0.5">{ label }</span>
+	</button>
+}
+
+templ Joystick(xIndex, yIndex uint8, m mapping.Mapping, row, col int, profile string, centerButtonIndex uint8) {
+	<div
+		class="relative flex items-center justify-center row-span-3 col-span-3"
+		style={ fmt.Sprintf("grid-column-start: %d; grid-row-start:%d;", col, row) }
+	>
+		<div hidden id="joystick-dot" class="absolute w-5 h-5 rounded-full bg-blue-900 border-2 border-blue-700 z-10"></div>
+		<div class="absolute w-full h-full rounded-full border-1 border-purple-700"></div>
+		@DirectionButton("", fmt.Sprintf("#%d", centerButtonIndex), map[string]any{"type": "button", "index": centerButtonIndex - 1}, func() string {
+			if key, ok := m.Buttons[centerButtonIndex-1]; ok {
+				if key.Mode == mapping.Mouse {
+					return mapping.CodeToMouse[key.Code]
+				} else {
+					return mapping.CodeToKey[key.Code]
+				}
+			}
+			return ""
+		}(), profile)
+		@DirectionButton("top-2 left-1/2 -translate-x-1/2", "0-",
+			map[string]any{"type": "axis", "index": yIndex, "subkey": "negative"},
+			func() string {
+				if axis, ok := m.Axes[yIndex]; ok {
+					key := axis.NegativeKey
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+		@DirectionButton("bottom-2 left-1/2 -translate-x-1/2", "0+",
+			map[string]any{"type": "axis", "index": yIndex, "subkey": "positive"},
+			func() string {
+				if axis, ok := m.Axes[yIndex]; ok {
+					key := axis.PositiveKey
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+		@DirectionButton("left-2 top-1/2 -translate-y-1/2", "1-",
+			map[string]any{"type": "axis", "index": xIndex, "subkey": "negative"},
+			func() string {
+				if axis, ok := m.Axes[xIndex]; ok {
+					key := axis.NegativeKey
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+		@DirectionButton("right-2 top-1/2 -translate-y-1/2", "1+",
+			map[string]any{"type": "axis", "index": xIndex, "subkey": "positive"},
+			func() string {
+				if axis, ok := m.Axes[xIndex]; ok {
+					key := axis.PositiveKey
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+	</div>
+}
+
+templ Hat(index uint8, m mapping.Mapping, row, col int, profile string, centerButtonIndex uint8) {
+	<div
+		class="relative flex items-center justify-center row-span-3 col-span-3"
+		style={ fmt.Sprintf("grid-column-start: %d; grid-row-start:%d;", col, row) }
+	>
+		@DirectionButton("", fmt.Sprintf("#%d", centerButtonIndex), map[string]any{"type": "button", "index": centerButtonIndex - 1}, func() string {
+			if key, ok := m.Buttons[centerButtonIndex-1]; ok {
+				if key.Mode == mapping.Mouse {
+					return mapping.CodeToMouse[key.Code]
+				} else {
+					return mapping.CodeToKey[key.Code]
+				}
+			}
+			return ""
+		}(), profile)
+		@DirectionButton("top-2 left-1/2 -translate-x-1/2", "↑",
+			map[string]any{"type": "hat", "index": index, "subkey": "up"},
+			func() string {
+				if hat, ok := m.Hats[index]; ok {
+					key := hat.Up
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+		@DirectionButton("bottom-2 left-1/2 -translate-x-1/2", "↓",
+			map[string]any{"type": "hat", "index": index, "subkey": "down"},
+			func() string {
+				if hat, ok := m.Hats[index]; ok {
+					key := hat.Down
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+		@DirectionButton("left-2 top-1/2 -translate-y-1/2", "←",
+			map[string]any{"type": "hat", "index": index, "subkey": "left"},
+			func() string {
+				if hat, ok := m.Hats[index]; ok {
+					key := hat.Left
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+		@DirectionButton("right-2 top-1/2 -translate-y-1/2", "→",
+			map[string]any{"type": "hat", "index": index, "subkey": "right"},
+			func() string {
+				if hat, ok := m.Hats[index]; ok {
+					key := hat.Right
+					if key.Mode == mapping.Mouse {
+						return mapping.CodeToMouse[key.Code]
+					} else {
+						return mapping.CodeToKey[key.Code]
+					}
+				}
+				return ""
+			}(),
+			profile,
+		)
+	</div>
+}
+
+templ cyborg2(m mapping.Mapping, profile string) {
+	<div class="grid grid-cols-10 grid-rows-6 gap-4">
+		@MappingButton(14, m, 1, 2, profile)
+		@MappingButton(15, m, 1, 3, profile)
+		@MappingButton(16, m, 1, 4, profile)
+		@MappingButton(17, m, 1, 5, profile)
+		@Hat(0, m, 1, 7, profile, 20)
+		@MappingButton(10, m, 2, 2, profile)
+		@MappingButton(11, m, 2, 3, profile)
+		@MappingButton(12, m, 2, 4, profile)
+		@MappingButton(13, m, 2, 5, profile)
+		@MappingButton(23, m, 3, 1, profile)
+		@MappingButton(6, m, 3, 2, profile)
+		@MappingButton(7, m, 3, 3, profile)
+		@MappingButton(8, m, 3, 4, profile)
+		@MappingButton(9, m, 3, 5, profile)
+		@MappingButton(5, m, 3, 6, profile)
+		@Joystick(0, 1, m, 4, 7, profile, 21)
+		@MappingButton(1, m, 4, 2, profile)
+		@MappingButton(2, m, 4, 3, profile)
+		@MappingButton(3, m, 4, 4, profile)
+		@MappingButton(4, m, 4, 5, profile)
+		@MappingButton(24, m, 5, 2, profile)
+		@MappingButton(25, m, 5, 3, profile)
+		@MappingButton(18, m, 5, 4, profile)
+		@MappingButton(19, m, 5, 5, profile)
+		@MappingButton(26, m, 5, 10, profile)
+		@MappingButton(22, m, 6, 10, profile)
+	</div>
+}

@@ -1,0 +1,48 @@
+version: 2
+
+project_name: noreza
+
+before:
+  hooks:
+    - templ generate
+
+builds:
+  - id: noreza
+    main: ./cmd/noreza
+    binary: noreza
+    env:
+      - CGO_ENABLED=1
+    flags:
+      - -trimpath
+    ldflags:
+      - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}"
+    goos:
+      - linux
+    goarch:
+      - amd64
+
+archives:
+  - id: release-archive
+    name_template: "{{ .ProjectName }}_{{ .Version }}"
+    files:
+      - LICENSE
+      - README.md
+
+changelog:
+  sort: desc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: caedis
+    name: noreza
+  draft: false
+  prerelease: auto
+  mode: replace
