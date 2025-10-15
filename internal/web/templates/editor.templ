@@ -40,8 +40,11 @@ templ Editor(m mapping.Mapping, profile, device string) {
 		<div
 			class="mt-12"
 		>
-			if device == "cyborg2" {
-				@cyborg2(m, profile)
+			switch (device) {
+				case "cyborg2":
+					@cyborg2(m, profile)
+				case "keyzen":
+					@keyzen(m, profile)
 			}
 		</div>
 	</div>
@@ -344,31 +347,64 @@ templ Hat(index uint8, m mapping.Mapping, row, col int, profile string, centerBu
 
 templ cyborg2(m mapping.Mapping, profile string) {
 	<div class="grid grid-cols-10 grid-rows-6 gap-4">
-		@MappingButton(14, m, 1, 2, profile)
-		@MappingButton(15, m, 1, 3, profile)
-		@MappingButton(16, m, 1, 4, profile)
-		@MappingButton(17, m, 1, 5, profile)
-		@Hat(0, m, 1, 7, profile, 20)
-		@MappingButton(10, m, 2, 2, profile)
-		@MappingButton(11, m, 2, 3, profile)
-		@MappingButton(12, m, 2, 4, profile)
-		@MappingButton(13, m, 2, 5, profile)
-		@MappingButton(23, m, 3, 1, profile)
-		@MappingButton(6, m, 3, 2, profile)
-		@MappingButton(7, m, 3, 3, profile)
-		@MappingButton(8, m, 3, 4, profile)
-		@MappingButton(9, m, 3, 5, profile)
-		@MappingButton(5, m, 3, 6, profile)
-		@Joystick(0, 1, m, 4, 7, profile, 21)
-		@MappingButton(1, m, 4, 2, profile)
-		@MappingButton(2, m, 4, 3, profile)
-		@MappingButton(3, m, 4, 4, profile)
-		@MappingButton(4, m, 4, 5, profile)
-		@MappingButton(24, m, 5, 2, profile)
-		@MappingButton(25, m, 5, 3, profile)
-		@MappingButton(18, m, 5, 4, profile)
-		@MappingButton(19, m, 5, 5, profile)
-		@MappingButton(26, m, 5, 10, profile)
-		@MappingButton(22, m, 6, 10, profile)
+		@MappingButton(1, m, 1, 2, profile)
+		@MappingButton(2, m, 1, 3, profile)
+		@MappingButton(3, m, 1, 4, profile)
+		@MappingButton(4, m, 1, 5, profile)
+		@Hat(0, m, 1, 7, profile, 25)
+		@MappingButton(5, m, 2, 2, profile)
+		@MappingButton(6, m, 2, 3, profile)
+		@MappingButton(7, m, 2, 4, profile)
+		@MappingButton(8, m, 2, 5, profile)
+		@MappingButton(9, m, 3, 1, profile)
+		@MappingButton(10, m, 3, 2, profile)
+		@MappingButton(11, m, 3, 3, profile)
+		@MappingButton(12, m, 3, 4, profile)
+		@MappingButton(13, m, 3, 5, profile)
+		@MappingButton(14, m, 3, 6, profile)
+		@Joystick(0, 1, m, 4, 7, profile, 26)
+		@MappingButton(15, m, 4, 2, profile)
+		@MappingButton(16, m, 4, 3, profile)
+		@MappingButton(17, m, 4, 4, profile)
+		@MappingButton(18, m, 4, 5, profile)
+		@MappingButton(19, m, 5, 2, profile)
+		@MappingButton(20, m, 5, 3, profile)
+		@MappingButton(21, m, 5, 4, profile)
+		@MappingButton(22, m, 5, 5, profile)
+		@MappingButton(23, m, 5, 10, profile)
+		@MappingButton(24, m, 6, 10, profile)
+	</div>
+}
+
+templ keyzen(m mapping.Mapping, profile string) {
+	<div class="grid grid-cols-10 grid-rows-6 gap-4">
+		@MappingButton(1, m, 1, 3, profile)
+		@MappingButton(2, m, 1, 4, profile)
+		@MappingButton(3, m, 1, 5, profile)
+		@Hat(0, m, 1, 7, profile, 27)
+		@MappingButton(4, m, 2, 2, profile)
+		@MappingButton(5, m, 2, 3, profile)
+		@MappingButton(6, m, 2, 4, profile)
+		@MappingButton(7, m, 2, 5, profile)
+		@MappingButton(8, m, 2, 6, profile)
+		@MappingButton(9, m, 3, 1, profile)
+		@MappingButton(10, m, 3, 2, profile)
+		@MappingButton(11, m, 3, 3, profile)
+		@MappingButton(12, m, 3, 4, profile)
+		@MappingButton(13, m, 3, 5, profile)
+		@MappingButton(14, m, 3, 6, profile)
+		@Joystick(0, 1, m, 4, 8, profile, 28)
+		@MappingButton(15, m, 4, 1, profile)
+		@MappingButton(16, m, 4, 2, profile)
+		@MappingButton(17, m, 4, 3, profile)
+		@MappingButton(18, m, 4, 4, profile)
+		@MappingButton(19, m, 4, 5, profile)
+		@MappingButton(20, m, 4, 6, profile)
+		@MappingButton(21, m, 5, 2, profile)
+		@MappingButton(22, m, 5, 3, profile)
+		@MappingButton(23, m, 5, 4, profile)
+		@MappingButton(24, m, 5, 5, profile)
+		@MappingButton(25, m, 5, 11, profile)
+		@MappingButton(26, m, 6, 11, profile)
 	</div>
 }

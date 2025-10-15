@@ -17,8 +17,12 @@ Preview
 - uinput access (user in input group)
 - Azeron device joystick set to analog, all buttons set to joystick buttons, and hat set to joystick up, down, left and right
 
-Required Azeron Hardware Profile
-![Required Azeron Hardware Profile](./imgs/AzeronProfile_Setup.png)
+Required Azeron Hardware Profiles
+
+Cyborg2
+![Required Azeron Hardware Profile](./imgs/Cyborg2_Hardware_Setup.png)
+
+Keyzen (Needed)
 
 
 ## Instructions
