@@ -1,6 +1,9 @@
 # Noreza
 ### A (unofficial) dedicated mapper for Azeron devices on Linux
 
+## Currently Supported Devices
+- Cyborg 2
+
 ## Features
 - Web interface
 - Visualize key presses and analog joystick
