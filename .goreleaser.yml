@@ -59,7 +59,7 @@ aurs:
       email: bot@goreleaser.com
     package: |-
       # bin
-      install -Dm755 $_pkgname "$pkgdir/usr/bin/$_pkgname"
+      install -Dm755 noreza "$pkgdir/usr/bin/noreza"
 
       # license
       install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
