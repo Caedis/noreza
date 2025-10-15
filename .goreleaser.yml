@@ -36,9 +36,6 @@ changelog:
       - '^test:'
       - '^chore:'
 
-checksum:
-  name_template: "checksums.txt"
-
 release:
   github:
     owner: caedis
@@ -51,6 +48,7 @@ release:
 aurs:
   - name: noreza-bin
     description: "A (unofficial) dedicated mapper for Azeron devices on Linux"
+    homepage: "https://github.com/Caedis/noreza"
     maintainers:
       - "Caedis"
     license: "LGPL3"
