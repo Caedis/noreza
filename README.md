@@ -17,13 +17,15 @@ Preview
 - uinput access (user in input group)
 - Azeron device joystick set to analog, all buttons set to joystick buttons, and hat set to joystick up, down, left and right
 
-Required Azeron Hardware Profiles
+### Required Azeron Hardware Profiles  
+\* Number in bottom left of key should be which JOY key is assigned.  
+\* Joystick MUST be set to "Analog Joystick".
 
 Cyborg2
 ![Required Azeron Hardware Profile](./imgs/Cyborg2_Hardware_Setup.png)
 
-Keyzen (Needed)
-
+Keyzen  
+![Required Azeron Hardware Profile](./imgs/Keyzen_Hardware_Setup.png)
 
 ## Instructions
 - Get serial of Azeron device (`lsusb -d 16d0: -v | grep iSerial`)
