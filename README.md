@@ -3,6 +3,7 @@
 
 ## Currently Supported Devices
 - Cyborg 2
+- Keyzen
 
 ## Features
 - Web interface
