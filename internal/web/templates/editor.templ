@@ -40,7 +40,6 @@ templ Editor(m mapping.Mapping, profile, device string) {
 		<div
 			class="mt-12"
 		>
-			{{ device = "cyborg" }}
 			switch (device) {
 				case "cyborg":
 					@cyborg(m, profile)

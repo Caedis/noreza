@@ -2,6 +2,7 @@
 ### A (unofficial) dedicated mapper for Azeron devices on Linux
 
 ## Currently Supported Devices
+- Cyborg 1
 - Cyborg 2
 - Keyzen
 
@@ -21,6 +22,9 @@ Preview
 ### Required Azeron Hardware Profiles  
 \* Number in bottom left of key should be which JOY key is assigned.  
 \* Joystick MUST be set to "Analog Joystick".
+
+Cyborg1
+![Required Azeron Hardware Profile](./imgs/Cyborg1_Hardware_Setup.png)
 
 Cyborg2
 ![Required Azeron Hardware Profile](./imgs/Cyborg2_Hardware_Setup.png)
