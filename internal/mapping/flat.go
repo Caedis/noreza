@@ -16,19 +16,25 @@ func (m *FlatMapping) Resolve(s *Store, evt JoystickEvent) ([]KeyMapping, []KeyM
 	var pressed, released []KeyMapping
 
 	markPressed := func(keys []KeyMapping) {
-		for _, k := range keys {
-			if !s.pressedKeys[k] {
-				s.pressedKeys[k] = true
-				pressed = append(pressed, k)
+		for _, key := range keys {
+			if k, found := s.pressedKeys[key]; found {
+				s.pressedKeys[key] = k + 1
+			} else {
+				s.pressedKeys[key] = 1
+				pressed = append(pressed, key)
 			}
 		}
 	}
 
 	markReleased := func(keys []KeyMapping) {
-		for _, k := range keys {
-			if s.pressedKeys[k] {
-				delete(s.pressedKeys, k)
-				released = append(released, k)
+		for _, key := range keys {
+			if k, found := s.pressedKeys[key]; found {
+				if k == 1 {
+					delete(s.pressedKeys, key)
+					released = append(released, key)
+				} else {
+					s.pressedKeys[key] = k - 1
+				}
 			}
 		}
 	}

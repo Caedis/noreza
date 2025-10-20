@@ -1,5 +1,7 @@
 package mapping
 
+import "strings"
+
 // Maps KeyboardEvent.code strings to Linux input-event codes
 var KeyToCode = map[string]int{
 	// Letters
@@ -52,6 +54,20 @@ var CodeToKey = func() map[int]string {
 	m := make(map[int]string, len(KeyToCode))
 	for k, v := range KeyToCode {
 		m[v] = k
+	}
+	return m
+}()
+
+var CodeToKeyFriendly = func() map[int]string {
+	m := make(map[int]string, len(KeyToCode))
+	for k, v := range KeyToCode {
+		key := k
+		key = strings.ReplaceAll(key, "Key", "")
+		key = strings.ReplaceAll(key, "Digit", "")
+		key = strings.ReplaceAll(key, "Numpad", "NP_")
+		key = strings.ReplaceAll(key, "Arrow", "")
+		key = strings.ReplaceAll(key, "Control", "Ctrl")
+		m[v] = key
 	}
 	return m
 }()

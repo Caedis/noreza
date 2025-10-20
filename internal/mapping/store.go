@@ -43,7 +43,7 @@ type Store struct {
 	activePath  string
 	lastHat     map[uint8]int16
 	lastAxis    map[uint8]int8
-	pressedKeys map[KeyMapping]bool
+	pressedKeys map[KeyMapping]int
 	eventSubs   atomic.Pointer[map[*chan SSEEvent]struct{}]
 }
 
@@ -54,7 +54,7 @@ func NewStore(profilesPath string, productID uint16) *Store {
 		ProductID:   productID,
 		lastHat:     make(map[uint8]int16),
 		lastAxis:    make(map[uint8]int8),
-		pressedKeys: make(map[KeyMapping]bool),
+		pressedKeys: make(map[KeyMapping]int),
 	}
 
 	s.eventSubs.Store(&map[*chan SSEEvent]struct{}{})
@@ -387,7 +387,7 @@ func (s *Store) ReleaseAll() []KeyMapping {
 	for k := range s.pressedKeys {
 		released = append(released, k)
 	}
-	s.pressedKeys = make(map[KeyMapping]bool)
+	s.pressedKeys = make(map[KeyMapping]int)
 	return released
 }
 
