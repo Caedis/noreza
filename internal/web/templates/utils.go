@@ -13,7 +13,7 @@ func concatKeys(keys []mapping.KeyMapping) string {
 		if v.Mode == mapping.Mouse {
 			keyVals = append(keyVals, mapping.CodeToMouse[v.Code])
 		} else {
-			keyVals = append(keyVals, mapping.CodeToKey[v.Code])
+			keyVals = append(keyVals, mapping.CodeToKeyFriendly[v.Code])
 		}
 	}
 
