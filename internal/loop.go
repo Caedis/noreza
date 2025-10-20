@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"log"
 
 	"github.com/caedis/noreza/internal/input"
 	"github.com/caedis/noreza/internal/mapping"
@@ -17,6 +18,12 @@ func RunEventLoop(ctx context.Context, reader *input.Reader, store *mapping.Stor
 		case <-ctx.Done():
 			return
 		case evt := <-events:
+			if !evt.Ready {
+				store.ReleaseAll()
+				log.Fatal("read error")
+				return
+			}
+
 			store.BroadcastEvent(mapping.SSEEvent{Type: mapping.EventJoystick, Data: evt})
 			press, release := store.Resolve(evt)
 			writer.Apply(press, release)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -39,10 +40,11 @@ type Store struct {
 	ProfilePath string
 	ProductID   uint16
 	// path to active symlink
-	activePath string
-	lastHat    map[uint8]int16
-	lastAxis   map[uint8]int8
-	eventSubs  atomic.Pointer[map[*chan SSEEvent]struct{}]
+	activePath  string
+	lastHat     map[uint8]int16
+	lastAxis    map[uint8]int8
+	pressedKeys map[KeyMapping]bool
+	eventSubs   atomic.Pointer[map[*chan SSEEvent]struct{}]
 }
 
 func NewStore(profilesPath string, productID uint16) *Store {
@@ -52,6 +54,7 @@ func NewStore(profilesPath string, productID uint16) *Store {
 		ProductID:   productID,
 		lastHat:     make(map[uint8]int16),
 		lastAxis:    make(map[uint8]int8),
+		pressedKeys: make(map[KeyMapping]bool),
 	}
 
 	s.eventSubs.Store(&map[*chan SSEEvent]struct{}{})
@@ -79,6 +82,8 @@ func (s *Store) ListProfiles() []Profile {
 	return out
 }
 
+var unmarshallError *json.UnmarshalTypeError
+
 func (s *Store) ReloadAllProfiles() error {
 	files, err := os.ReadDir(s.ProfilePath)
 	if err != nil {
@@ -100,7 +105,12 @@ func (s *Store) ReloadAllProfiles() error {
 		}
 
 		var m Mapping
-		if err := json.Unmarshal(data, &m); err != nil {
+		err = json.Unmarshal(data, &m)
+		if errors.As(err, &unmarshallError) {
+			s.migrateProfile(m, data)
+			data, _ = json.MarshalIndent(m, "", "\t")
+			go os.WriteFile(filepath.Join(s.ProfilePath, f.Name()), data, 0755)
+		} else if err != nil {
 			continue
 		}
 
@@ -138,7 +148,13 @@ func (s *Store) ReloadProfile(name string) error {
 	}
 
 	var m Mapping
-	if err := json.Unmarshal(data, &m); err != nil {
+	err = json.Unmarshal(data, &m)
+	if errors.As(err, &unmarshallError) {
+		s.migrateProfile(m, data)
+		data, _ = json.MarshalIndent(m, "", "\t")
+		go os.WriteFile(profileFile, data, 0755)
+
+	} else if err != nil {
 		return fmt.Errorf("unmarshal profile: %w", err)
 	}
 
@@ -362,6 +378,19 @@ func (s *Store) SetActiveProfile(name string) error {
 	return nil
 }
 
+func (s *Store) ReleaseAll() []KeyMapping {
+	if len(s.pressedKeys) == 0 {
+		return nil
+	}
+
+	released := make([]KeyMapping, 0, len(s.pressedKeys))
+	for k := range s.pressedKeys {
+		released = append(released, k)
+	}
+	s.pressedKeys = make(map[KeyMapping]bool)
+	return released
+}
+
 func (s *Store) setActive(name string) {
 	s.ActiveProfile.Store(name)
 
@@ -376,6 +405,49 @@ func (s *Store) setActive(name string) {
 	} else {
 		s.ActiveMapping.Store(nil)
 	}
+}
+
+func (s *Store) migrateProfile(newMapping Mapping, oldData []byte) error {
+	var oldMapping Mapping_V1
+	if err := json.Unmarshal(oldData, &oldMapping); err != nil {
+		return fmt.Errorf("Error migrating profile")
+	}
+
+	for i, axe := range oldMapping.Axes {
+		newMapping.Axes[i] = AxisMapping{
+			PositiveKey: []KeyMapping{
+				{Code: axe.PositiveKey.Code, Mode: KeyMode(axe.PositiveKey.Mode)},
+			},
+			NegativeKey: []KeyMapping{
+				{Code: axe.NegativeKey.Code, Mode: KeyMode(axe.NegativeKey.Mode)},
+			},
+		}
+	}
+
+	for i, hat := range oldMapping.Hats {
+		newMapping.Hats[i] = HatMapping{
+			Up: []KeyMapping{
+				{Code: hat.Up.Code, Mode: KeyMode(hat.Up.Mode)},
+			},
+			Down: []KeyMapping{
+				{Code: hat.Down.Code, Mode: KeyMode(hat.Down.Mode)},
+			},
+			Left: []KeyMapping{
+				{Code: hat.Left.Code, Mode: KeyMode(hat.Left.Mode)},
+			},
+			Right: []KeyMapping{
+				{Code: hat.Right.Code, Mode: KeyMode(hat.Right.Mode)},
+			},
+		}
+	}
+
+	for i, key := range oldMapping.Buttons {
+		newMapping.Buttons[i] = []KeyMapping{
+			{Code: key.Code, Mode: KeyMode(key.Mode)},
+		}
+	}
+
+	return nil
 }
 
 func (s *Store) ReloadActive() error {
