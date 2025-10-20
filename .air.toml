@@ -5,7 +5,7 @@ tmp_dir = "bin"
 
 [build]
   bin = "./bin/noreza"
-  cmd = "templ generate && tailwindcss -i ./internal/web/static/css/input.css -o ./internal/web/static/css/style.css 2>/dev/null && go build -o ./bin/noreza ./cmd/noreza/main.go"
+  cmd = "templ generate && tailwindcss -i ./internal/web/static/css/input.css -o ./internal/web/static/css/dist/style.css && go build -o ./bin/noreza ./cmd/noreza/main.go"
   delay = 0
   exclude_dir = ["static", "node_modules"]
   exclude_regex = [".*_templ.go"]

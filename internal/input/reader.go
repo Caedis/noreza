@@ -44,13 +44,13 @@ func (r *Reader) Stream(out chan<- mapping.JoystickEvent) {
 	for {
 		evt, err := r.dev.ReadOne()
 		if err != nil {
-			log.Fatal("read error:", err)
+			out <- mapping.JoystickEvent{}
 			return
 		}
 
 		switch evt.Type {
 		case evdev.EV_KEY:
-			out <- mapping.JoystickEvent{Type: "button", Index: keyMap[evt.Code], Value: int16(evt.Value)}
+			out <- mapping.JoystickEvent{Type: "button", Index: keyMap[evt.Code], Value: int16(evt.Value), Ready: true}
 		case evdev.EV_ABS:
 			switch evt.Code {
 			case evdev.ABS_HAT0X:
@@ -72,11 +72,11 @@ func (r *Reader) Stream(out chan<- mapping.JoystickEvent) {
 						value = 4
 					}
 				}
-				out <- mapping.JoystickEvent{Type: "hat", Index: 0, Value: value}
+				out <- mapping.JoystickEvent{Type: "hat", Index: 0, Value: value, Ready: true}
 			default:
 				if absInfo, ok := absInfos[evt.Code]; ok {
 					scaled := scaleAxisToInt16(evt.Value, absInfo.Minimum, absInfo.Maximum)
-					out <- mapping.JoystickEvent{Type: "axis", Index: uint8(evt.Code), Value: scaled}
+					out <- mapping.JoystickEvent{Type: "axis", Index: uint8(evt.Code), Value: scaled, Ready: true}
 				}
 			}
 		}

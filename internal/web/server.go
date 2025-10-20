@@ -13,16 +13,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/caedis/noreza/internal/mapping"
 	"github.com/caedis/noreza/internal/web/templates"
-	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	// Allow all connections
-	CheckOrigin: func(r *http.Request) bool { return true },
+type rawMapping struct {
+	Code string          `json:"code"`
+	Mode mapping.KeyMode `json:"mode"`
 }
 
 //go:embed static
@@ -94,8 +92,39 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, 
 
 		keyType := vals.Get("type")
 		subKey := vals.Get("subkey")
-		index, _ := strconv.Atoi(vals.Get("index"))
-		templates.EditorModal(profile, uint8(index), keyType, subKey).Render(r.Context(), w)
+		indexVal, _ := strconv.Atoi(vals.Get("index"))
+		index := uint8(indexVal)
+
+		mappings := *store.Mappings.Load()
+		keyMap, ok := mappings[profile]
+		if !ok {
+			log.Println("error looking up mapping")
+			return
+		}
+
+		clientKeys := make([]rawMapping, 0)
+		existingKeys := keyMap.GetKeys(keyType, subKey, index)
+		for _, key := range existingKeys {
+			if key.Code == 0 {
+				continue
+			}
+
+			switch key.Mode {
+			case mapping.Mouse:
+				clientKeys = append(clientKeys, rawMapping{
+					Mode: key.Mode,
+					Code: mapping.CodeToMouse[key.Code],
+				})
+			case mapping.Keyboard:
+				clientKeys = append(clientKeys, rawMapping{
+					Mode: key.Mode,
+					Code: mapping.CodeToKey[key.Code],
+				})
+			}
+		}
+
+		keyString, _ := templ.JSONString(clientKeys)
+		templates.EditorModal(profile, index, keyType, subKey, keyString).Render(r.Context(), w)
 	})
 
 	mux.HandleFunc("PATCH /profiles/{profile}/update", func(w http.ResponseWriter, r *http.Request) {
@@ -105,32 +134,33 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, 
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		updateKeysRaw := r.PostFormValue("updateKeys")
 
-		modeRaw, err := strconv.Atoi(r.PostForm.Get("mode"))
-		if err != nil {
-			http.Error(w, "invalid mode", http.StatusBadRequest)
-			return
-		}
-		mode := mapping.KeyMode(modeRaw)
-
-		value := r.PostForm.Get("value")
-		var code int
-		var ok bool
-		switch mode {
-		case mapping.Mouse:
-			code, ok = mapping.MouseToCode[value]
-		case mapping.Keyboard:
-			code, ok = mapping.KeyToCode[value]
-		}
-
-		if !ok {
-			http.Error(w, "unsupported key", http.StatusBadRequest)
+		var rawMap *[]rawMapping
+		if err := json.Unmarshal([]byte(updateKeysRaw), &rawMap); err != nil {
+			http.Error(w, "unable to parse keys", http.StatusInternalServerError)
 			return
 		}
 
-		keyType := r.PostForm.Get("type")
-		subKey := r.PostForm.Get("subkey")
-		index, err := strconv.Atoi(r.PostForm.Get("index"))
+		updateKeys := make([]mapping.KeyMapping, 0)
+		for _, v := range *rawMap {
+			switch v.Mode {
+			case mapping.Mouse:
+				updateKeys = append(updateKeys, mapping.KeyMapping{
+					Mode: v.Mode,
+					Code: mapping.MouseToCode[v.Code],
+				})
+			case mapping.Keyboard:
+				updateKeys = append(updateKeys, mapping.KeyMapping{
+					Mode: v.Mode,
+					Code: mapping.KeyToCode[v.Code],
+				})
+			}
+		}
+
+		keyType := r.PostFormValue("type")
+		subKey := r.PostFormValue("subkey")
+		index, err := strconv.Atoi(r.PostFormValue("index"))
 		if err != nil {
 			http.Error(w, "invalid index", http.StatusBadRequest)
 			return
@@ -144,7 +174,7 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, 
 			return
 		}
 
-		m.UpdateBinding(keyType, subKey, uint8(index), mode, code)
+		m.UpdateBinding(keyType, subKey, uint8(index), updateKeys)
 
 		// Recompile FlatMapping
 		flat := mapping.CompileFlatMapping(*m)

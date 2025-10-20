@@ -7,7 +7,6 @@ require (
 	github.com/a-h/templ v0.3.943
 	github.com/bendahl/uinput v1.7.0
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/gorilla/websocket v1.5.3
 	github.com/holoplot/go-evdev v0.0.0-20250804134636-ab1d56a1fe83
 	golang.org/x/text v0.29.0
 )

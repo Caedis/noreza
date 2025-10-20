@@ -9,6 +9,7 @@ type JoystickEvent struct {
 	Type  string `json:"type"`
 	Index uint8  `json:"index"`
 	Value int16  `json:"value"`
+	Ready bool   `json:"-"`
 }
 
 func (j *JoystickEvent) String() string {
@@ -28,16 +29,21 @@ type KeyMapping struct {
 	Mode KeyMode `json:"mode"`
 }
 
+func (k *KeyMapping) String() string {
+	str, _ := json.Marshal(k)
+	return string(str)
+}
+
 type AxisMapping struct {
-	PositiveKey KeyMapping `json:"positive_key"`
-	NegativeKey KeyMapping `json:"negative_key"`
+	PositiveKey []KeyMapping `json:"positive_key"`
+	NegativeKey []KeyMapping `json:"negative_key"`
 }
 
 type HatMapping struct {
-	Up    KeyMapping `json:"up"`
-	Down  KeyMapping `json:"down"`
-	Left  KeyMapping `json:"left"`
-	Right KeyMapping `json:"right"`
+	Up    []KeyMapping `json:"up"`
+	Down  []KeyMapping `json:"down"`
+	Left  []KeyMapping `json:"left"`
+	Right []KeyMapping `json:"right"`
 }
 
 type WindowProfileCfg struct {
@@ -46,11 +52,11 @@ type WindowProfileCfg struct {
 }
 
 type Mapping struct {
-	WindowProfile WindowProfileCfg      `json:"window_profiles"`
-	AxisDeadzone  int16                 `json:"axes_deadzone,omitempty"`
-	Axes          map[uint8]AxisMapping `json:"axes,omitempty"`
-	Buttons       map[uint8]KeyMapping  `json:"buttons,omitempty"`
-	Hats          map[uint8]HatMapping  `json:"hats,omitempty"`
+	WindowProfile WindowProfileCfg       `json:"window_profiles"`
+	AxisDeadzone  int16                  `json:"axes_deadzone,omitempty"`
+	Axes          map[uint8]AxisMapping  `json:"axes,omitempty"`
+	Buttons       map[uint8][]KeyMapping `json:"buttons,omitempty"`
+	Hats          map[uint8]HatMapping   `json:"hats,omitempty"`
 }
 
 func (m *Mapping) LoadFromFile(path string) error {
@@ -79,13 +85,12 @@ func (m *Mapping) WriteToFile(path string) error {
 	return nil
 }
 
-func (m *Mapping) UpdateBinding(keyType, subKey string, index uint8, mode KeyMode, code int) {
-	key := KeyMapping{Code: code, Mode: mode}
+func (m *Mapping) UpdateBinding(keyType, subKey string, index uint8, key []KeyMapping) {
 
 	switch keyType {
 	case "button":
 		if m.Buttons == nil {
-			m.Buttons = make(map[uint8]KeyMapping)
+			m.Buttons = make(map[uint8][]KeyMapping)
 		}
 		m.Buttons[index] = key
 
@@ -122,7 +127,7 @@ func (m *Mapping) UpdateBinding(keyType, subKey string, index uint8, mode KeyMod
 }
 
 func (m *Mapping) ClearBindings() {
-	key := KeyMapping{Code: 0, Mode: 0}
+	key := []KeyMapping{}
 	for k := range m.Axes {
 		axis := m.Axes[k]
 		axis.NegativeKey = key
