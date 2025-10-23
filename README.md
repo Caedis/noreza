@@ -23,14 +23,29 @@ Preview
 \* Number in bottom left of key should be which JOY key is assigned.  
 \* Joystick MUST be set to "Analog Joystick".
 
-Cyborg1
+<details>
+<summary>Cyborg1</summary>
+
 ![Required Azeron Hardware Profile](./imgs/Cyborg1_Hardware_Setup.png)
+</details>
 
-Cyborg2
+<details>
+<summary>Cyborg2</summary>
+
 ![Required Azeron Hardware Profile](./imgs/Cyborg2_Hardware_Setup.png)
+</details>
+<details>
 
-Keyzen  
+<summary>Cyro</summary>
+
+![Required Azeron Hardware Profile](./imgs/Cyro_Hardware_Setup.png)
+</details>
+<details>
+
+<summary>Keyzen</summary>
+
 ![Required Azeron Hardware Profile](./imgs/Keyzen_Hardware_Setup.png)
+</details>
 
 ## Instructions
 - Get serial of Azeron device (`lsusb -d 16d0: -v | grep iSerial`)
