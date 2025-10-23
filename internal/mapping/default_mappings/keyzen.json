@@ -2,150 +2,218 @@
     "axes_deadzone": 14000,
     "axes": {
         "0": {
-            "positive_key": {
-                "code": 0,
-                "mode": 0
-            },
-            "negative_key": {
-                "code": 0,
-                "mode": 0
-            }
+            "positive_key": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ],
+            "negative_key": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ]
         },
         "1": {
-            "positive_key": {
-                "code": 0,
-                "mode": 0
-            },
-            "negative_key": {
-                "code": 0,
-                "mode": 0
-            }
+            "positive_key": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ],
+            "negative_key": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ]
         }
     },
     "buttons": {
-        "0": {
-            "code": 0,
-            "mode": 0
-        },
-        "1": {
-            "code": 0,
-            "mode": 0
-        },
-        "2": {
-            "code": 0,
-            "mode": 0
-        },
-        "3": {
-            "code": 0,
-            "mode": 0
-        },
-        "4": {
-            "code": 0,
-            "mode": 0
-        },
-        "5": {
-            "code": 0,
-            "mode": 0
-        },
-        "6": {
-            "code": 0,
-            "mode": 0
-        },
-        "7": {
-            "code": 0,
-            "mode": 0
-        },
-        "8": {
-            "code": 0,
-            "mode": 0
-        },
-        "9": {
-            "code": 0,
-            "mode": 0
-        },
-        "10": {
-            "code": 0,
-            "mode": 0
-        },
-        "11": {
-            "code": 0,
-            "mode": 0
-        },
-        "12": {
-            "code": 0,
-            "mode": 0
-        },
-        "13": {
-            "code": 0,
-            "mode": 0
-        },
-        "14": {
-            "code": 0,
-            "mode": 0
-        },
-        "15": {
-            "code": 0,
-            "mode": 0
-        },
-        "16": {
-            "code": 0,
-            "mode": 0
-        },
-        "17": {
-            "code": 0,
-            "mode": 0
-        },
-        "18": {
-            "code": 0,
-            "mode": 0
-        },
-        "19": {
-            "code": 0,
-            "mode": 0
-        },
-        "20": {
-            "code": 0,
-            "mode": 0
-        },
-        "21": {
-            "code": 0,
-            "mode": 0
-        },
-        "22": {
-            "code": 0,
-            "mode": 0
-        },
-        "23": {
-            "code": 0,
-            "mode": 0
-        },
-        "24": {
-            "code": 0,
-            "mode": 0
-        },
-        "25": {
-            "code": 0,
-            "mode": 0
-        }
-    },
-    "hats": {
-        "0": {
-            "up": {
-                "code": 0,
-                "mode": 0
-            },
-            "right": {
-                "code": 0,
-                "mode": 0
-            },
-            "down": {
-                "code": 0,
-                "mode": 0
-            },
-            "left": {
+        "0": [
+            {
                 "code": 0,
                 "mode": 0
             }
+        ],
+        "1": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "2": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "3": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "4": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "5": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "6": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "7": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "8": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "9": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "10": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "11": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "12": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "13": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "14": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "15": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "16": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "17": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "18": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "19": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "20": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "21": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "22": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "23": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "24": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ],
+        "25": [
+            {
+                "code": 0,
+                "mode": 0
+            }
+        ]
+    },
+    "hats": {
+        "0": {
+            "up": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ],
+            "right": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ],
+            "down": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ],
+            "left": [
+                {
+                    "code": 0,
+                    "mode": 0
+                }
+            ]
         }
     }
 }
