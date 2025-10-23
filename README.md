@@ -4,6 +4,8 @@
 ## Currently Supported Devices
 - Cyborg 1
 - Cyborg 2
+- Cyro
+- Cyro (Lefty)
 - Keyzen
 
 ## Features
@@ -34,12 +36,21 @@ Preview
 
 ![Required Azeron Hardware Profile](./imgs/Cyborg2_Hardware_Setup.png)
 </details>
+
 <details>
 
 <summary>Cyro</summary>
 
 ![Required Azeron Hardware Profile](./imgs/Cyro_Hardware_Setup.png)
 </details>
+
+<details>
+
+<summary>Cyro (Lefty)</summary>
+
+![Required Azeron Hardware Profile](./imgs/CyroLefty_Hardware_Setup.png)
+</details>
+
 <details>
 
 <summary>Keyzen</summary>

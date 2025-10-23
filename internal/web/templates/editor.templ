@@ -47,6 +47,8 @@ templ Editor(m mapping.Mapping, profile, device string) {
 					@cyborg2(m, profile)
 				case "cyro":
 					@cyro(m, profile)
+				case "cyro-lefty":
+					@cyro_lefty(m, profile)
 				case "keyzen":
 					@keyzen(m, profile)
 			}
@@ -407,6 +409,32 @@ templ cyro(m mapping.Mapping, profile string) {
 		@MappingButton(14, m, 6, 6, profile)
 		@MappingButton(15, m, 6, 7, profile)
 		@MappingButton(16, m, 6, 8, profile)
+	</div>
+}
+
+templ cyro_lefty(m mapping.Mapping, profile string) {
+	<div class="grid grid-cols-8 grid-rows-6 gap-4">
+		@MappingButton(1, m, 3, 2, profile)
+		@MappingButton(2, m, 3, 3, profile)
+		@MappingButton(3, m, 3, 4, profile)
+		@MappingButton(4, m, 3, 5, profile)
+		@MappingButton(5, m, 4, 2, profile)
+		@MappingButton(6, m, 4, 3, profile)
+		@MappingButton(7, m, 4, 4, profile)
+		<div class="col-start-5 row-start-5 flex items-center justify-center ml-3 rounded-lg bg-purple-900 relative h-18 w-12 cursor-not-allowed text-xs whitespace-pre-line overflow-y-scroll">
+			NYI
+		</div>
+		@MappingButton(8, m, 5, 1, profile)
+		@MappingButton(9, m, 5, 2, profile)
+		@MappingButton(10, m, 5, 3, profile)
+		@MappingButton(11, m, 5, 4, profile)
+		@MappingButton(12, m, 6, 1, profile)
+		@MappingButton(13, m, 6, 2, profile)
+		@MappingButton(14, m, 6, 3, profile)
+		@MappingButton(15, m, 6, 4, profile)
+		@MappingButton(16, m, 4, 5, profile)
+		@Hat(0, m, 1, 6, profile, 17)
+		@Joystick(0, 1, m, 4, 6, profile, 18)
 	</div>
 }
 

@@ -487,7 +487,7 @@ func GetDeviceFromID(productID uint16) (string, error) {
 	case 4498:
 		return "classic-tansy", nil
 	case 4626:
-		return "cryo-lefty", nil
+		return "cyro-lefty", nil
 	case 4855:
 		return "cyborg2", nil
 	case 5098:
