@@ -24,7 +24,7 @@ import (
 var inputSerial = flag.String("serial", "", "serial of target azeron device")
 var port = flag.Int("port", 1337, "web server port")
 var quiet = flag.Bool("quiet", false, "disable logging")
-var wait = flag.Bool("wait", false, "")
+var wait = flag.Bool("wait", false, "wait for device to connect instead of exiting if not found")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
