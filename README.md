@@ -19,7 +19,7 @@ Preview
 
 ## Requirements
 - uinput access (user in input group)
-- Azeron device joystick set to analog, all buttons set to joystick buttons, and hat set to joystick up, down, left and right
+- Azeron device joystick set to analog, all buttons set to joystick buttons, and hat set to joystick dpad up, down, left and right
 
 ### Required Azeron Hardware Profiles  
 \* Number in bottom left of key should be which JOY key is assigned.  
