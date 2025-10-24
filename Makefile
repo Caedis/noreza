@@ -5,7 +5,7 @@ dev/air:
 	air -build.args_bin "--serial ${SERIAL}"
 
 dev:
-	templ generate && tailwindcss -i ./internal/web/static/css/input.css -o ./internal/web/static/css/dist/style.css 2>/dev/null && go run ./cmd/noreza/main.go --serial "${SERIAL}"
+	templ generate && tailwindcss -i ./internal/web/static/css/input.css -o ./internal/web/static/css/dist/style.css 2>/dev/null && go run ./cmd/noreza/main.go --wait --serial "${SERIAL}"
 
 profile:
 	templ generate && \

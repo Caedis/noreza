@@ -24,6 +24,7 @@ import (
 var inputSerial = flag.String("serial", "", "serial of target azeron device")
 var port = flag.Int("port", 1337, "web server port")
 var quiet = flag.Bool("quiet", false, "disable logging")
+var wait = flag.Bool("wait", false, "")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
@@ -50,10 +51,28 @@ func main() {
 		log.Fatal("No input device serial provided")
 	}
 
-	devicePath, productID, err := input.GetDevicePath(*inputSerial)
-	if err != nil {
-		log.Fatal(err)
+	log.Println("Connecting to device")
+	var devicePath string
+	var productID uint16
+	var err error
+	var wroteMessage bool
+	for {
+		devicePath, productID, err = input.GetDevicePath(*inputSerial)
+		if err != nil {
+			if !*wait {
+				log.Fatal(err.Error())
+				return
+			}
+			if !wroteMessage {
+				log.Println("Retrying every 2s for device to be connected")
+				wroteMessage = true
+			}
+			time.Sleep(2 * time.Second)
+			continue
+		}
+		break
 	}
+	log.Print("Connected\n")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

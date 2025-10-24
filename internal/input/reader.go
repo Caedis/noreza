@@ -117,7 +117,6 @@ func GetDevicePath(serial string) (string, uint16, error) {
 			fullPath := filepath.Join(basePath, file.Name())
 			dev, err := evdev.Open(fullPath)
 			if err != nil {
-				log.Printf("failed to open input device '%s': %v", file.Name(), err)
 				continue
 			}
 			defer dev.Close()
