@@ -100,7 +100,7 @@ func (r *Reader) String() string {
 	return ""
 }
 
-func GetDevicePath(serial string) (string, uint16, error) {
+func GetDevicePath(serial string, productID uint16) (string, uint16, error) {
 	basePath := "/dev/input/by-id"
 
 	files, err := os.ReadDir(basePath)
@@ -113,22 +113,31 @@ func GetDevicePath(serial string) (string, uint16, error) {
 			continue
 		}
 
-		if strings.Contains(file.Name(), serial) && strings.HasSuffix(file.Name(), "event-joystick") {
+		if strings.HasSuffix(file.Name(), "event-joystick") {
 			fullPath := filepath.Join(basePath, file.Name())
 			dev, err := evdev.Open(fullPath)
 			if err != nil {
 				continue
 			}
 			defer dev.Close()
-			uid, _ := dev.UniqueID()
-			if uid == serial {
-				inputID, _ := dev.InputID()
-				return fullPath, inputID.Product, nil
+			inputID, err := dev.InputID()
+			if err != nil {
+				return "", 0, err
+			}
+			if serial != "" {
+				uid, _ := dev.UniqueID()
+				if uid == serial {
+					return fullPath, inputID.Product, nil
+				}
+			} else if productID != 0 {
+				if inputID.Product == productID {
+					return fullPath, inputID.Product, nil
+				}
 			}
 		}
 	}
 
-	return "", 0, fmt.Errorf("device not found for serial '%s'", serial)
+	return "", 0, fmt.Errorf("device not found for serial or product-id")
 }
 
 func scaleAxisToInt16(value int32, min int32, max int32) int16 {

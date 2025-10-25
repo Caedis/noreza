@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"runtime"
 	"runtime/pprof"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -22,6 +23,7 @@ import (
 )
 
 var inputSerial = flag.String("serial", "", "serial of target azeron device")
+var inputProductID = flag.Uint("product-id", 0, "product id of target azeron device\nPrefix with 0x\nOnly use if your device has no serial\nWill pull the first device found with product id")
 var port = flag.Int("port", 1337, "web server port")
 var quiet = flag.Bool("quiet", false, "disable logging")
 var wait = flag.Bool("wait", false, "wait for device to connect instead of exiting if not found")
@@ -47,8 +49,8 @@ func main() {
 		log.SetOutput(io.Discard)
 	}
 
-	if *inputSerial == "" {
-		log.Fatal("No input device serial provided")
+	if *inputSerial == "" && *inputProductID == 0 {
+		log.Fatal("No input device serial/product-id provided")
 	}
 
 	log.Println("Connecting to device")
@@ -57,7 +59,7 @@ func main() {
 	var err error
 	var wroteMessage bool
 	for {
-		devicePath, productID, err = input.GetDevicePath(*inputSerial)
+		devicePath, productID, err = input.GetDevicePath(*inputSerial, uint16(*inputProductID))
 		if err != nil {
 			if !*wait {
 				log.Fatal(err.Error())
@@ -72,17 +74,24 @@ func main() {
 		}
 		break
 	}
-	log.Print("Connected\n")
+	log.Println("Connected")
+
+	var deviceIdentifier string
+	if *inputSerial != "" {
+		deviceIdentifier = *inputSerial
+	} else if *inputProductID != 0 {
+		deviceIdentifier = strconv.Itoa(int(*inputProductID))
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	writer, err := output.NewWriter(*inputSerial)
+	writer, err := output.NewWriter(deviceIdentifier)
 	if err != nil {
 		log.Fatalf("error creating writer: %v", err)
 	}
 
-	profilesPath := paths.ProfilesDir(*inputSerial)
+	profilesPath := paths.ProfilesDir(deviceIdentifier)
 	if err := os.MkdirAll(profilesPath, 0755); err != nil {
 		log.Fatalf("error creating profile directory: %v", err)
 	}
@@ -115,7 +124,7 @@ func main() {
 		}
 		go switcher.Start(ctx)
 	}
-	go web.RunServer(ctx, *port, store, reader.String(), *inputSerial)
+	go web.RunServer(ctx, *port, store, reader.String(), deviceIdentifier)
 	go internal.RunEventLoop(ctx, reader, store, writer)
 
 	sigs := make(chan os.Signal, 1)
