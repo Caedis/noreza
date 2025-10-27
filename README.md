@@ -60,13 +60,12 @@ Preview
 
 ## Instructions
 - Get serial of Azeron device (`lsusb -d 16d0: -v | grep iSerial`)
-- `./noreza --serial <SERIAL>`
-- Access the web interface at localhost:1337 (port can be changed)
+- `noreza --serial <SERIAL>`
+    - If your device does not have a serial or it shows as 0, you can pass the product id instead `noreza --product-id 0x12f7`
+    - It is the 2nd segment of lsusb, e.g. `16d0:12f7`
+- You can pass `--wait` to have the program wait for a matching device to be connected
+- Access the web interface at localhost:1337 (port can be changed with `--port`)
 
 
 ## Tips:
 - A udev rule might be useful to start the process on device connect (process stops if device disconnects)
-
-
-# TODO:
-- Hardware Profiles
