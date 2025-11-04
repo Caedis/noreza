@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
+	"github.com/caedis/noreza/internal/input"
 	"github.com/caedis/noreza/internal/mapping"
 	"github.com/caedis/noreza/internal/web/templates"
 )
@@ -26,12 +27,12 @@ type rawMapping struct {
 //go:embed static
 var staticFiles embed.FS
 
-func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, serial string) {
+func RunServer(ctx context.Context, port int, store *mapping.Store, reader *input.Reader, serial string) {
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.FileServerFS(staticFiles))
 
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
-		templates.Layout(deviceDesc, serial).Render(r.Context(), w)
+		templates.Layout(reader.String(), serial).Render(r.Context(), w)
 	})
 
 	mux.HandleFunc("GET /profiles", func(w http.ResponseWriter, r *http.Request) {
@@ -200,7 +201,8 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, 
 			return
 		}
 
-		templates.Editor(*m, profile, device).Render(r.Context(), w)
+		metadata := *store.Metadata.Load()
+		templates.Editor(*m, profile, device, metadata).Render(r.Context(), w)
 	})
 
 	mux.HandleFunc("GET /profiles/{profile}/editor", func(w http.ResponseWriter, r *http.Request) {
@@ -218,7 +220,8 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, 
 			Data: profile,
 		})
 
-		templates.Editor(*m, profile, device).Render(r.Context(), w)
+		metadata := *store.Metadata.Load()
+		templates.Editor(*m, profile, device, metadata).Render(r.Context(), w)
 	})
 
 	mux.HandleFunc("PATCH /profiles/{profile}/clear", func(w http.ResponseWriter, r *http.Request) {
@@ -257,7 +260,8 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, 
 			return
 		}
 
-		templates.Editor(*m, profile, device).Render(r.Context(), w)
+		metadata := *store.Metadata.Load()
+		templates.Editor(*m, profile, device, metadata).Render(r.Context(), w)
 	})
 
 	mux.HandleFunc("GET /profiles/{profile}/settings", func(w http.ResponseWriter, r *http.Request) {
@@ -336,6 +340,57 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, deviceDesc, 
 				fmt.Fprintf(w, "data: %s\n\n", data)
 				flusher.Flush()
 			}
+		}
+	})
+
+	mux.HandleFunc("GET /device/settings", func(w http.ResponseWriter, r *http.Request) {
+		metadata := store.Metadata.Load()
+
+		templates.DeviceSettingsModal(*metadata).Render(r.Context(), w)
+	})
+
+	mux.HandleFunc("PATCH /device/settings", func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		selectedProfile := r.FormValue("selectedProfile")
+		selectedProfile = strings.ReplaceAll(selectedProfile, "\"", "")
+
+		oppositeHand := r.FormValue("oppositeHand")
+		exclusiveAccess := r.FormValue("exclusiveAccess")
+
+		metadata := mapping.Metadata{
+			IsOppositeHand:  oppositeHand == "on",
+			ExclusiveAccess: exclusiveAccess == "on",
+		}
+
+		store.Metadata.Store(&metadata)
+		err := store.SaveMetadata()
+
+		if metadata.ExclusiveAccess {
+			reader.Grab()
+		} else {
+			reader.Ungrab()
+		}
+
+		if err != nil {
+			http.Error(w, "error saving device settings", http.StatusInternalServerError)
+			return
+		}
+		if selectedProfile != "null" {
+			mappings := *store.RawMappings.Load()
+			m := mappings[selectedProfile]
+
+			device, err := mapping.GetDeviceFromID(store.ProductID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			templates.Editor(*m, selectedProfile, device, metadata).Render(r.Context(), w)
+		} else {
+			templates.EditorDefault(false).Render(r.Context(), w)
 		}
 	})
 

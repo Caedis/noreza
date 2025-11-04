@@ -13,10 +13,16 @@ templ header(deviceDesc string) {
 }
 
 templ sidebar(deviceDesc, identifier string) {
-	<aside class="w-64 bg-gray-800 text-white flex flex-col">
+	<aside class="w-64 bg-gray-800 text-white flex flex-col items-center">
 		<span class="text-center pt-2 text-lg">Azeron { deviceDesc }</span>
 		<span class="text-center pb-2 text-xs">Device Identifier: ...{ identifier[len(identifier)-4:] }</span>
-		<ul id="profiles" hx-get="/profiles" hx-swap="innerHTML" hx-trigger="load" class="flex-1 overflow-y-auto"></ul>
+		<button
+			class="ml-3 bg-gray-500 hover:bg-gray-600 rounded-md px-4 py-1 text-sm"
+			hx-get="/device/settings"
+			hx-target="#modal-wrapper"
+			hx-swap="innerHTML"
+		>Device Settings</button>
+		<ul id="profiles" hx-get="/profiles" hx-swap="innerHTML" hx-trigger="load" class="flex-1 w-full overflow-y-auto"></ul>
 	</aside>
 }
 
@@ -31,6 +37,7 @@ templ Layout(deviceDesc, identifier string) {
 					<main id="editor" class="flex-1 bg-gray-900">
 						@EditorDefault(false)
 					</main>
+					<dialog id="modal-wrapper"></dialog>
 				</div>
 			</div>
 		</body>
