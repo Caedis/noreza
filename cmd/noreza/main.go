@@ -100,6 +100,7 @@ func main() {
 	if err := store.CreateIfNeeded(); err != nil {
 		log.Fatal(err)
 	}
+	store.LoadMetadata()
 	if err := store.ReloadAllProfiles(); err != nil {
 		log.Fatal("failed to load mapping:", err)
 	}
@@ -113,6 +114,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to start reader: %v", err)
 	}
+	metadata := store.Metadata.Load()
+	if metadata.ExclusiveAccess {
+		reader.Grab()
+	} else {
+		reader.Ungrab()
+	}
 
 	if _, found := os.LookupEnv("WAYLAND_DISPLAY"); found {
 		log.Println("Active window watching disabled on wayland")
@@ -124,7 +131,7 @@ func main() {
 		}
 		go switcher.Start(ctx)
 	}
-	go web.RunServer(ctx, *port, store, reader.String(), deviceIdentifier)
+	go web.RunServer(ctx, *port, store, reader, deviceIdentifier)
 	go internal.RunEventLoop(ctx, reader, store, writer)
 
 	sigs := make(chan os.Signal, 1)

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -29,7 +30,13 @@ type WindowProfile struct {
 	Profile    string
 }
 
+type Metadata struct {
+	IsOppositeHand  bool `json:"opposite_hand"`
+	ExclusiveAccess bool `json:"exclusive_access"`
+}
+
 type Store struct {
+	Metadata       atomic.Pointer[Metadata]
 	ActiveMapping  atomic.Pointer[FlatMapping]
 	Mappings       atomic.Pointer[map[string]*FlatMapping]
 	RawMappings    atomic.Pointer[map[string]*Mapping]
@@ -37,6 +44,7 @@ type Store struct {
 	// name of active profile
 	ActiveProfile atomic.Value
 
+	DevicePath  string
 	ProfilePath string
 	ProductID   uint16
 	// path to active symlink
@@ -49,6 +57,7 @@ type Store struct {
 
 func NewStore(profilesPath string, productID uint16) *Store {
 	s := Store{
+		DevicePath:  path.Dir(profilesPath),
 		ProfilePath: profilesPath,
 		activePath:  filepath.Join(profilesPath, "active"),
 		ProductID:   productID,
@@ -477,17 +486,17 @@ func (s *Store) Resolve(evt JoystickEvent) ([]KeyMapping, []KeyMapping) {
 func GetDeviceFromID(productID uint16) (string, error) {
 	switch productID {
 	case 3903:
-		return "classic", nil
-	case 4284: // cyborg1
 		fallthrough
-	case 4412: // cyborg1-tansy
+	case 4498:
+		return "classic", nil
+	case 4284:
+		fallthrough
+	case 4412:
 		return "cyborg", nil
 	case 4355:
-		return "cyro", nil
-	case 4498:
-		return "classic-tansy", nil
+		fallthrough
 	case 4626:
-		return "cyro-lefty", nil
+		return "cyro", nil
 	case 4855:
 		return "cyborg2", nil
 	case 5098:
@@ -509,6 +518,33 @@ func (s *Store) SaveProfile(name string) error {
 		return err
 	}
 	go os.WriteFile(filepath.Join(s.ProfilePath, name+".json"), data, 0755)
+	return nil
+}
+
+func (s *Store) LoadMetadata() {
+	data, err := os.ReadFile(filepath.Join(s.DevicePath, "metadata.json"))
+	if os.IsNotExist(err) {
+		s.SaveMetadata()
+		data, _ = os.ReadFile(filepath.Join(s.DevicePath, "metadata.json"))
+	}
+	var meta Metadata
+	err = json.Unmarshal(data, &meta)
+	if err != nil {
+		return
+	}
+	s.Metadata.Store(&meta)
+}
+
+func (s *Store) SaveMetadata() error {
+	metadata := s.Metadata.Load()
+	if metadata == nil {
+		metadata = &Metadata{}
+	}
+	data, err := json.MarshalIndent(metadata, "", "	")
+	if err != nil {
+		return err
+	}
+	os.WriteFile(filepath.Join(s.DevicePath, "metadata.json"), data, 0755)
 	return nil
 }
 

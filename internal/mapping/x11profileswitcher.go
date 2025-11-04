@@ -45,7 +45,6 @@ func (a *AutoProfileSwitcher) Start(ctx context.Context) {
 		case <-ticker.C:
 			win, err := a.getFocusedWindow()
 			if err != nil {
-				log.Println("Error getting focused window:", err)
 				continue
 			}
 			if win == rootWin {
@@ -54,7 +53,6 @@ func (a *AutoProfileSwitcher) Start(ctx context.Context) {
 
 			topMostWin, err := a.getTopLevelWindow(win, rootWin)
 			if err != nil {
-				log.Println("Error getting topmost window:", err)
 				continue
 			}
 

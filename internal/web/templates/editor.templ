@@ -15,7 +15,7 @@ templ EditorDefault(isSwap bool) {
 	}
 }
 
-templ Editor(m mapping.Mapping, profile, device string) {
+templ Editor(m mapping.Mapping, profile, device string, metadata mapping.Metadata) {
 	<script>
 		var joystick_size = 248
 		var deadzone = {{ m.AxisDeadzone }}
@@ -40,21 +40,29 @@ templ Editor(m mapping.Mapping, profile, device string) {
 		<div
 			class="mt-12"
 		>
+			{{ var controlList []Control }}
 			switch (device) {
+				case "classic":
+					{{ controlList = ClassicLayout }}
 				case "cyborg":
-					@cyborg(m, profile)
+					{{ controlList = Cyborg1Layout }}
 				case "cyborg2":
-					@cyborg2(m, profile)
+					{{ controlList = Cyborg2Layout }}
 				case "cyro":
-					@cyro(m, profile)
+					{{ fallthrough }}
 				case "cyro-lefty":
-					@cyro_lefty(m, profile)
+					{{ controlList = CyroLayout }}
 				case "keyzen":
-					@keyzen(m, profile)
+					{{ controlList = KeyzenLayout }}
 			}
+			<div class="grid grid-cols-10 grid-rows-6 gap-4">
+				for _, c := range controlList {
+					{{ row, col := c.Position(10, metadata.IsOppositeHand) }}
+					@c.Render(m, profile, row, col)
+				}
+			</div>
 		</div>
 	</div>
-	<dialog id="modal-wrapper"></dialog>
 }
 
 templ EditorModal(profile string, index uint8, mappingType, subkey, keyString string) {
@@ -324,7 +332,16 @@ templ Hat(index uint8, m mapping.Mapping, row, col int, profile string, centerBu
 	</div>
 }
 
-templ cyborg(m mapping.Mapping, profile string) {
+templ CyroScroll(index uint8, m mapping.Mapping, row, col int, profile string) {
+	<div 
+	class="flex items-center justify-center ml-3 rounded-lg bg-purple-900 relative h-18 w-12 cursor-not-allowed text-xs whitespace-pre-line overflow-y-scroll"
+	style={ fmt.Sprintf("grid-column-start: %d; grid-row-start:%d;", col, row) }
+	>
+			NYI
+	</div>
+}
+
+templ cyborg(m mapping.Mapping, profile string, isOppositeHand bool) {
 	<div class="grid grid-cols-10 grid-rows-6 gap-4">
 		@MappingButton(1, m, 1, 2, profile)
 		@MappingButton(2, m, 1, 3, profile)
@@ -354,7 +371,7 @@ templ cyborg(m mapping.Mapping, profile string) {
 	</div>
 }
 
-templ cyborg2(m mapping.Mapping, profile string) {
+templ cyborg2(m mapping.Mapping, profile string, isOppositeHand bool) {
 	<div class="grid grid-cols-10 grid-rows-6 gap-4">
 		@MappingButton(1, m, 1, 2, profile)
 		@MappingButton(2, m, 1, 3, profile)
@@ -438,7 +455,7 @@ templ cyro_lefty(m mapping.Mapping, profile string) {
 	</div>
 }
 
-templ keyzen(m mapping.Mapping, profile string) {
+templ keyzen(m mapping.Mapping, profile string, isOppositeHand bool) {
 	<div class="grid grid-cols-10 grid-rows-6 gap-4">
 		@MappingButton(1, m, 1, 3, profile)
 		@MappingButton(2, m, 1, 4, profile)

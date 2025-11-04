@@ -75,3 +75,60 @@ templ SettingsModal(profile string, deadzone int16, windowProfileCfg mapping.Win
 		model.showModal();
 	</script>
 }
+
+templ DeviceSettingsModal(metadata mapping.Metadata) {
+	<div
+		class="fixed inset-0 flex items-center justify-center"
+	>
+		<div
+			class="bg-gray-800 p-3 text-center text-white w-120 relative"
+		>
+			<h2 class="text-xl mb-4">Device Settings</h2>
+			<form
+				hx-patch="/device/settings"
+				hx-target="#editor"
+				hx-vals="js:{selectedProfile: Alpine.store('profiles').selectedProfile }"
+				x-on:submit="document.getElementById('modal-wrapper').close()"
+			>
+				<fieldset class="mb-2">
+					<label>Opposite Hand</label>
+					<input
+						class="bg-gray-300 text-black"
+						name="oppositeHand"
+						type="checkbox"
+						checked?={ metadata.IsOppositeHand }
+					/>
+				</fieldset>
+				<fieldset class="mb-2">
+					<label>Exclusive Access</label>
+					<input
+						class="bg-gray-300 text-black"
+						name="exclusiveAccess"
+						type="checkbox"
+						checked?={ metadata.ExclusiveAccess }
+					/>
+				</fieldset>
+				<menu>
+					<button
+						type="submit"
+						class="p-1 rounded bg-green-600 hover:bg-green-700"
+					>
+						Save
+					</button>
+				</menu>
+			</form>
+			<button
+				class="absolute top-1 right-1 text-xs p-1 text-gray-500 hover:text-gray-600 font-bold"
+				onclick="document.getElementById('modal-wrapper').close()"
+				hx-disinherit="*"
+			>
+				X
+			</button>
+		</div>
+	</div>
+	<script>
+		var model = document.getElementById('modal-wrapper');
+		model.setAttribute("closedby", "closerequest");
+		model.showModal();
+	</script>
+}

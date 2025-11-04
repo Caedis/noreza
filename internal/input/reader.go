@@ -84,6 +84,14 @@ func (r *Reader) Stream(out chan<- mapping.JoystickEvent) {
 	}
 }
 
+func (r *Reader) Grab() {
+	r.dev.Grab()
+}
+
+func (r *Reader) Ungrab() {
+	r.dev.Ungrab()
+}
+
 func (r *Reader) String() string {
 	if r.dev != nil {
 		id, err := r.dev.InputID()
