@@ -2,6 +2,7 @@
 ### A (unofficial) dedicated mapper for Azeron devices on Linux
 
 ## Currently Supported Devices
+- Classic
 - Cyborg 1
 - Cyborg 2
 - Cyro
@@ -12,6 +13,7 @@
 - Web interface
 - Visualize key presses and analog joystick
 - X11 Auto Profile Switching
+- Option to visually mirror layout for opposite hand devices
 
 Preview
 ![Preview](./imgs/Noreza_Preview.png)
@@ -23,7 +25,8 @@ Preview
 
 ### Required Azeron Hardware Profiles  
 \* Number in bottom left of key should be which JOY key is assigned.  
-\* Joystick MUST be set to "Analog Joystick".
+\* Joystick MUST be set to "Analog Joystick".  
+\* Any not listed can be found by viewing in the web browser
 
 <details>
 <summary>Cyborg1</summary>
