@@ -68,7 +68,3 @@ Preview
     - It is the 2nd segment of lsusb, e.g. `16d0:12f7`
 - You can pass `--wait` to have the program wait for a matching device to be connected
 - Access the web interface at localhost:1337 (port can be changed with `--port`)
-
-
-## Tips:
-- A udev rule might be useful to start the process on device connect (process stops if device disconnects)
