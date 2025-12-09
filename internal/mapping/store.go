@@ -33,6 +33,7 @@ type WindowProfile struct {
 type Metadata struct {
 	IsOppositeHand  bool `json:"opposite_hand"`
 	ExclusiveAccess bool `json:"exclusive_access"`
+	InvertAxes      bool `json:"invert_axes"`
 }
 
 type Store struct {

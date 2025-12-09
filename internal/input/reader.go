@@ -15,14 +15,18 @@ import (
 
 type Reader struct {
 	dev *evdev.InputDevice
+	invertAxes  bool
 }
 
-func NewReader(path string) (*Reader, error) {
+func NewReader(path string, invert_axes bool) (*Reader, error) {
 	dev, err := evdev.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	return &Reader{dev: dev}, nil
+	return &Reader{
+		dev: dev,
+		invertAxes: invert_axes,
+	}, nil
 }
 
 func (r *Reader) Close() {
@@ -35,6 +39,11 @@ func (r *Reader) Stream(out chan<- mapping.JoystickEvent) {
 	for i, t := range keyEvents {
 		keyMap[t] = uint8(i)
 	}
+
+	invertScale := int16(1)
+	if r.invertAxes {
+        invertScale = int16(-1)
+    }
 
 	absInfos, err := r.dev.AbsInfos()
 	if err != nil {
@@ -76,6 +85,7 @@ func (r *Reader) Stream(out chan<- mapping.JoystickEvent) {
 			default:
 				if absInfo, ok := absInfos[evt.Code]; ok {
 					scaled := scaleAxisToInt16(evt.Value, absInfo.Minimum, absInfo.Maximum)
+					scaled = scaled * invertScale
 					out <- mapping.JoystickEvent{Type: "axis", Index: uint8(evt.Code), Value: scaled, Ready: true}
 				}
 			}

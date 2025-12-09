@@ -360,10 +360,12 @@ func RunServer(ctx context.Context, port int, store *mapping.Store, reader *inpu
 
 		oppositeHand := r.FormValue("oppositeHand")
 		exclusiveAccess := r.FormValue("exclusiveAccess")
+		invertAxes := r.FormValue("invertAxes")
 
 		metadata := mapping.Metadata{
 			IsOppositeHand:  oppositeHand == "on",
 			ExclusiveAccess: exclusiveAccess == "on",
+			InvertAxes: invertAxes == "on",
 		}
 
 		store.Metadata.Store(&metadata)
