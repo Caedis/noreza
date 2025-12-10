@@ -100,6 +100,15 @@ templ DeviceSettingsModal(metadata mapping.Metadata) {
 					/>
 				</fieldset>
 				<fieldset class="mb-2">
+					<label>Invert Axes</label>
+					<input
+						class="bg-gray-300 text-black"
+						name="invertAxes"
+						type="checkbox"
+						checked?={ metadata.InvertAxes }
+					/>
+				</fieldset>
+				<fieldset class="mb-2">
 					<label>Exclusive Access</label>
 					<input
 						class="bg-gray-300 text-black"

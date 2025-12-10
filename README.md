@@ -9,6 +9,9 @@
 - Cyro (Lefty)
 - Keyzen
 
+## Note For Opposite Hand Devices
+You may need to enable "Invert Axes" in the global device settings to invert the joystick. A restart is required after enabling it.
+
 ## Features
 - Web interface
 - Visualize key presses and analog joystick

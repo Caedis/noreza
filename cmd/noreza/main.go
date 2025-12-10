@@ -110,11 +110,11 @@ func main() {
 
 	go store.WatchProfiles(ctx)
 
-	reader, err := input.NewReader(devicePath)
+	metadata := store.Metadata.Load()
+	reader, err := input.NewReader(devicePath, metadata.InvertAxes)
 	if err != nil {
 		log.Fatalf("failed to start reader: %v", err)
 	}
-	metadata := store.Metadata.Load()
 	if metadata.ExclusiveAccess {
 		reader.Grab()
 	} else {
