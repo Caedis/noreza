@@ -19,7 +19,6 @@ func RunEventLoop(ctx context.Context, reader *input.Reader, store *mapping.Stor
 			return
 		case evt := <-events:
 			if !evt.Ready {
-				store.ReleaseAll()
 				log.Fatal("read error")
 				return
 			}
