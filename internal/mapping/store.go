@@ -49,11 +49,10 @@ type Store struct {
 	ProfilePath string
 	ProductID   uint16
 	// path to active symlink
-	activePath  string
-	lastHat     map[uint8]int16
-	lastAxis    map[uint8]int8
-	pressedKeys map[KeyMapping]int
-	eventSubs   atomic.Pointer[map[*chan SSEEvent]struct{}]
+	activePath string
+	lastHat    map[uint8]int16
+	lastAxis   map[uint8]int8
+	eventSubs  atomic.Pointer[map[*chan SSEEvent]struct{}]
 }
 
 func NewStore(profilesPath string, productID uint16) *Store {
@@ -64,7 +63,6 @@ func NewStore(profilesPath string, productID uint16) *Store {
 		ProductID:   productID,
 		lastHat:     make(map[uint8]int16),
 		lastAxis:    make(map[uint8]int8),
-		pressedKeys: make(map[KeyMapping]int),
 	}
 
 	s.eventSubs.Store(&map[*chan SSEEvent]struct{}{})
@@ -386,19 +384,6 @@ func (s *Store) SetActiveProfile(name string) error {
 	})
 
 	return nil
-}
-
-func (s *Store) ReleaseAll() []KeyMapping {
-	if len(s.pressedKeys) == 0 {
-		return nil
-	}
-
-	released := make([]KeyMapping, 0, len(s.pressedKeys))
-	for k := range s.pressedKeys {
-		released = append(released, k)
-	}
-	s.pressedKeys = make(map[KeyMapping]int)
-	return released
 }
 
 func (s *Store) setActive(name string) {
