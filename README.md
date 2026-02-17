@@ -1,3 +1,6 @@
+## Archiving and switching to https://github.com/renatoi/azeron-linux
+
+
 # Noreza
 ### A (unofficial) dedicated mapper for Azeron devices on Linux
 
